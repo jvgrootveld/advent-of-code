@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-// ReadFileAsInts reads and return content as []int. Fail on error
+// ReadFileAsInts reads and return content as []int. Fails on error.
 func ReadFileAsInts(file string) []int {
 	f, err := os.Open(file)
 	if err != nil {
@@ -34,6 +34,37 @@ func readInts(r io.Reader) ([]int, error) {
 			return nil, err
 		}
 		result = append(result, n)
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// ReadFileAsStrings reads and return content as []string. Fails on error.
+func ReadFileAsStrings(file string) []string {
+	f, err := os.Open(file)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer f.Close()
+
+	result, err := readStrings(f)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return result
+}
+
+func readStrings(r io.Reader) ([]string, error) {
+	var result []string
+
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		result = append(result, scanner.Text())
 	}
 
 	if err := scanner.Err(); err != nil {

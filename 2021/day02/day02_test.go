@@ -1,4 +1,4 @@
-package day01
+package day02
 
 import (
 	"fmt"
@@ -7,10 +7,10 @@ import (
 )
 
 func TestPart01(t *testing.T) {
-	content := shared.ReadFileAsInts("input.txt")
+	content := shared.ReadFileAsStrings("input.txt")
 
 	result := Part01(content)
-	answer := 1390
+	answer := 1947824
 
 	fmt.Println("Result: ", result)
 	if result != answer {
@@ -19,13 +19,14 @@ func TestPart01(t *testing.T) {
 }
 
 func TestPart02(t *testing.T) {
-	content := shared.ReadFileAsInts("input.txt")
+	content := shared.ReadFileAsStrings("input.txt")
 
 	result := Part02(content)
-	answer := 1457
+	answer := 1813062561
 
 	fmt.Println("Result: ", result)
 	if result != answer {
 		t.Fatalf("Incorrect answer. Got '%v' expected '%v'", result, answer)
 	}
 }
+

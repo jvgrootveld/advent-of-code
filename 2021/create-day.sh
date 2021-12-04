@@ -22,7 +22,7 @@ func Part02(input []int) int {
 
 	return 0
 }
-" > "${DAY}/part1.go"
+" > "${DAY}/${DAY}.go"
 
 
 echo "package ${DAY}
@@ -37,13 +37,23 @@ func TestPart01(t *testing.T) {
 	content := shared.ReadFileAsInts(\"input_example.txt\")
 
 	result := Part01(content)
-	fmt.Println(\"Result: \", result) // ???
+	answer := -1
+
+	fmt.Println(\"Result: \", result)
+	if result != answer {
+		t.Fatalf(\"Incorrect answer. Got '%v' expected '%v'\", result, answer)
+	}
 }
 
 func TestPart02(t *testing.T) {
 	content := shared.ReadFileAsInts(\"input_example.txt\")
 
 	result := Part02(content)
-	fmt.Println(\"Result: \", result) // ???
+	answer := -1
+
+	fmt.Println(\"Result: \", result)
+	if result != answer {
+		t.Fatalf(\"Incorrect answer. Got '%v' expected '%v'\", result, answer)
+	}
 }
-" > "${DAY}/part1_test.go"
+" > "${DAY}/${DAY}_test.go"
