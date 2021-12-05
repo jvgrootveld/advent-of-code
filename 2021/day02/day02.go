@@ -5,6 +5,10 @@ import (
 	"strings"
 )
 
+// Part01
+// forward X increases the horizontal position by X units.
+// down X increases the depth by X units.
+// up X decreases the depth by X units.
 func Part01(input []string) int {
 	distance := 0
 	depth := 0
@@ -27,6 +31,12 @@ func Part01(input []string) int {
 	return distance * depth
 }
 
+// Part02
+// down X increases your aim by X units.
+// up X decreases your aim by X units.
+// forward X does two things:
+// - It increases your horizontal position by X units.
+// - It increases your depth by your aim multiplied by X.
 func Part02(input []string) int {
 	distance := 0
 	depth := 0
