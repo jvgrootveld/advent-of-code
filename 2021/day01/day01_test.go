@@ -1,31 +1,55 @@
 package day01
 
 import (
-	"fmt"
 	"github.com/jvgrootveld/advent-of-code/avent2021/shared"
 	"testing"
 )
 
+type testResult struct {
+	name     string
+	expected int
+}
+
 func TestPart01(t *testing.T) {
-	content := shared.ReadFileAsInts("input.txt")
+	var tests = []testResult{
+		{"example", 7},
+		{"input", 1390},
+	}
 
-	result := Part01(content)
-	answer := 1390
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
 
-	fmt.Println("Result: ", result)
-	if result != answer {
-		t.Fatalf("Incorrect answer. Got '%v' expected '%v'", result, answer)
+			content := shared.ReadFileAsInts(test.name + ".txt")
+			result := Part01(content)
+
+			t.Log("Result: ", result)
+			if result != test.expected {
+				t.Fatalf("Incorrect answer. Got '%v' expected '%v'", result, test.expected)
+			}
+		})
 	}
 }
 
 func TestPart02(t *testing.T) {
-	content := shared.ReadFileAsInts("input.txt")
+	var tests = []testResult{
+		{"example", 5},
+		{"input", 1457},
+	}
 
-	result := Part02(content)
-	answer := 1457
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
 
-	fmt.Println("Result: ", result)
-	if result != answer {
-		t.Fatalf("Incorrect answer. Got '%v' expected '%v'", result, answer)
+			content := shared.ReadFileAsInts(test.name + ".txt")
+			result := Part02(content)
+
+			t.Log("Result: ", result)
+			if result != test.expected {
+				t.Fatalf("Incorrect answer. Got '%v' expected '%v'", result, test.expected)
+			}
+		})
 	}
 }
