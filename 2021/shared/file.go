@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 // ReadFileAsInts reads and return content as []int. Fails on error.
@@ -41,6 +42,30 @@ func readInts(r io.Reader) ([]int, error) {
 	}
 
 	return result, nil
+}
+
+// ReadFileAsCommaInts reads, splits on comma and return content as []int. Fails on error.
+func ReadFileAsCommaInts(file string) []int {
+	f, err := os.Open(file)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer f.Close()
+
+	rows, err := readStrings(f)
+	if err != nil {
+		log.Fatalln(err)
+	} else if len(rows) > 1 {
+		log.Fatalln("Expect only one row. Got: ", len(rows))
+	}
+
+	var result []int
+	for _, item := range strings.Split(rows[0], ",") {
+		number, _ := strconv.Atoi(item)
+		result = append(result, number)
+	}
+
+	return result
 }
 
 // ReadFileAsStrings reads and return content as []string. Fails on error.
