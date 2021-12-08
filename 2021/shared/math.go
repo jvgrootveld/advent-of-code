@@ -14,3 +14,11 @@ func SumInts(values []int) int {
 func Pow(x, pow int) uint64 {
 	return uint64(math.Pow(float64(x), float64(pow)))
 }
+
+// IntAbs Absolute for integers
+func IntAbs(value int) int {
+	if value < 0 {
+		return -value
+	}
+	return value
+}
