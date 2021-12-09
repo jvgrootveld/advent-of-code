@@ -7,12 +7,10 @@ import (
 
 type CalcFuelCost func(input []int, place int) int
 
-// Part01
 func Part01(input []int) int {
 	return findMostEfficientPlace(input, calcFuelCost)
 }
 
-// Part02
 func Part02(input []int) int {
 	return findMostEfficientPlace(input, calcFuelCostSummation)
 }

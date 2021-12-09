@@ -11,14 +11,12 @@ import (
 	\"fmt\"
 )
 
-// Part01
 func Part01(input []string) int {
 	fmt.Println(\"HO HO HO!\")
 
 	return 0
 }
 
-// Part02
 func Part02(input []string) int {
 	fmt.Println(\"HO HO HO!\")
 

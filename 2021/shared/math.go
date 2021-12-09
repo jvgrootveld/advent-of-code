@@ -10,9 +10,14 @@ func SumInts(values []int) int {
 	return total
 }
 
-// Pow quick way to power te wanted uint64 type
+// Pow quick way to power the wanted uint64 type
 func Pow(x, pow int) uint64 {
 	return uint64(math.Pow(float64(x), float64(pow)))
+}
+
+// PowInt quick way to power the wanted int type
+func PowInt(x, pow int) int {
+	return int(math.Pow(float64(x), float64(pow)))
 }
 
 // IntAbs Absolute for integers
