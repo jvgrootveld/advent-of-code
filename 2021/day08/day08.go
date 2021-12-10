@@ -111,14 +111,14 @@ func Part02(input []string) int {
 	return total
 }
 
-// sortEachGroup sort letters in each group
+// sortEachGroup sort.go letters in each group
 func sortEachGroup(groups []string) {
 	for i := 0; i < len(groups); i++ {
 		groups[i] = sortString(groups[i])
 	}
 }
 
-// sortString sort letters in string
+// sortString sort.go letters in string
 func sortString(value string) string {
 	letters := strings.Split(value, "")
 	sort.Strings(letters)
