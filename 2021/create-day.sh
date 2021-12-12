@@ -2,9 +2,9 @@
 
 DAY="$*"
 
-mkdir "${DAY}"
-touch "${DAY}/input.txt"
-touch "${DAY}/example.txt"
+mkdir -p "${DAY}/data"
+touch "${DAY}/data/input.txt"
+touch "${DAY}/data/example.txt"
 echo "package ${DAY}
 
 import (
@@ -48,7 +48,7 @@ func TestPart01(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			content := shared.ReadFileAsStrings(test.name + \".txt\")
+			content := shared.ReadFileAsStrings(\"data/\" + test.name + \".txt\")
 			result := Part01(content)
 
 			t.Log(\"Result: \", result)
@@ -70,7 +70,7 @@ func TestPart02(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			content := shared.ReadFileAsStrings(test.name + \".txt\")
+			content := shared.ReadFileAsStrings(\"data/\" + test.name + \".txt\")
 			result := Part02(content)
 
 			t.Log(\"Result: \", result)
