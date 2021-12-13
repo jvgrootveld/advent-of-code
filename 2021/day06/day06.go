@@ -1,41 +1,58 @@
 package day06
 
-import (
-	"fmt"
-)
+import "github.com/jvgrootveld/advent-of-code/avent2021/shared"
 
-// Part01
 func Part01(input []int, days int) int {
-	var school []int
+	totalFish := 0
 
-	for _, in := range input {
-		school = append(school, in)
+	cache := make(map[int]int)
+
+	for _, daysLeft := range input {
+		totalFish += countFish(days - daysLeft, cache)
 	}
 
-	//fmt.Printf("Initial state: %v\n", school)
-	for currentDay := 1; currentDay <= days; currentDay++ {
-		currentLength := len(school)
-		for i := 0; i < currentLength; i++ {
-			school[i]--
-
-			if school[i] < 0 {
-				// Reset
-				school[i] = 6
-				// Add new fish
-				school = append(school, 8)
-			}
-		}
-		//fmt.Printf("After %2d days: %v\n", currentDay, school)
-	}
-
-	return len(school)
+	return totalFish
 }
 
-// Part02
 func Part02(input []int, days int) int {
-	fmt.Println("HO HO HO!")
+	school := make([]int, 9)
 
-	// TODO need better algorithm for 265 days
+	for _, daysLeft := range input {
+		school[daysLeft]++
+	}
 
-	return 0
+	for currentDay := 1; currentDay <= days; currentDay++ {
+
+		// Fish to birth
+		toBirth := school[0]
+
+		// Decrease days
+		for i := 1; i <= 8; i++ {
+			school[i-1] = school[i]
+		}
+
+		school[6] += toBirth
+		school[8] = toBirth
+	}
+
+	return shared.SumInts(school)
+}
+
+
+func countFish(daysLeft int, cache map[int]int) int {
+	if result, ok := cache[daysLeft]; ok {
+		return result
+	}
+
+	// Count this fish
+	total := 1
+
+	for i := 0; i < daysLeft; i += 7 {
+		// -9 for first new fish
+		total += countFish(daysLeft - 9 - i, cache)
+	}
+
+	cache[daysLeft] = total
+
+	return total
 }
