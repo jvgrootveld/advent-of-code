@@ -9,15 +9,20 @@ echo "package ${DAY}
 
 import (
 	\"fmt\"
+	\"github.com/jvgrootveld/advent-of-code/avent2021/shared\"
 )
 
 func Part01(input []string) int {
+  defer shared.Elapsed(\"${DAY} Part02\")()
+
 	fmt.Println(\"HO HO HO!\")
 
 	return 0
 }
 
 func Part02(input []string) int {
+  defer shared.Elapsed(\"${DAY} Part02\")()
+
 	fmt.Println(\"HO HO HO!\")
 
 	return 0
