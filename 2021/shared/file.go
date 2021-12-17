@@ -68,6 +68,34 @@ func ReadFileAsCommaInts(file string) []int {
 	return result
 }
 
+// ReadFileAsIntGrid reads and return content as a grid of [][]int. Fails on error.
+func ReadFileAsIntGrid(file string) [][]int {
+	f, err := os.Open(file)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer f.Close()
+
+	rows, err := readStrings(f)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var result [][]int
+
+	for _, row := range rows {
+		rowInts := make([]int, len(row))
+
+		for i, point := range row {
+			rowInts[i] = int(point - '0') // Convert rune/char to real int value
+		}
+
+		result = append(result, rowInts)
+	}
+
+	return result
+}
+
 // ReadFileAsStrings reads and return content as []string. Fails on error.
 func ReadFileAsStrings(file string) []string {
 	f, err := os.Open(file)

@@ -13,7 +13,7 @@ import (
 )
 
 func Part01(input []string) int {
-  defer shared.Elapsed(\"${DAY} Part02\")()
+	defer shared.Elapsed(\"${DAY} Part02\")()
 
 	fmt.Println(\"HO HO HO!\")
 
@@ -21,7 +21,7 @@ func Part01(input []string) int {
 }
 
 func Part02(input []string) int {
-  defer shared.Elapsed(\"${DAY} Part02\")()
+	defer shared.Elapsed(\"${DAY} Part02\")()
 
 	fmt.Println(\"HO HO HO!\")
 
