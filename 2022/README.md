@@ -1,5 +1,5 @@
-# Advent of Code 2025
-My solutions to the [Advent of Code 2015](https://adventofcode.com/2015) puzzles.
+# Advent of Code 2022
+My solutions to the [Advent of Code 2022](https://adventofcode.com/2022) puzzles.
 
 ## Test
 
