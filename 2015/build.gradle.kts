@@ -41,23 +41,23 @@ task("addDay") {
             error("Missing required argument 'day'")
         }
 
-        val dayString = "day${day.padStart(2, '0')}"
-        println("Create day: ${dayString.capitalized()}")
+        val paddedDay = day.padStart(2, '0')
+        println("Create Day$paddedDay")
 
         createFile(
-            "src/main/kotlin/$dayString/${dayString.capitalized()}.kt",
+            "src/main/kotlin/day$paddedDay/Day$paddedDay.kt",
             """
-        package $dayString
+        package day$paddedDay
 
-        class ${dayString.capitalized()} {
+        class Day$paddedDay {
 
             companion object {
             
-                fun part1(input: String): Int {
+                fun part1(input: List<String>): Int {
                     TODO("IMPLEMENT")
                 }
-
-                fun part2(input: String): Int {
+        
+                fun part2(input: List<String>): Int {
                     TODO("IMPLEMENT")
                 }
             }
@@ -66,34 +66,34 @@ task("addDay") {
         )
 
         createFile(
-            "src/test/resources/$dayString.txt",
-            "Replace with $dayString puzzle input"
+            "src/test/resources/day$paddedDay.txt",
+            "Replace with day$paddedDay puzzle input"
         )
 
         createFile(
-            "src/test/kotlin/${dayString.capitalized()}Test.kt",
+            "src/test/kotlin/Day${paddedDay}Test.kt",
             """
-import $dayString.${dayString.capitalized()}
+import day$paddedDay.Day$paddedDay
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 
-internal class Day02Test {
+internal class Day${paddedDay}Test {
 
     @ParameterizedTest
     @CsvSource(
         "input, 0",
     )
     fun `part1 examples`(input: String, expectedResult: Int) {
-        assertEquals(expectedResult, ${dayString.capitalized()}.part1(input))
+        assertEquals(expectedResult, Day$paddedDay.part1(listOf(input)))
     }
 
     @Test
     fun `part1 puzzel input`() {
-        val input = Resource.readFile("$dayString")
-        assertEquals(0, ${dayString.capitalized()}.part1(input))
+        val input = Resource.readFileLines("day$paddedDay")
+        assertEquals(0, Day$paddedDay.part1(input))
     }
 
     @ParameterizedTest
@@ -101,13 +101,13 @@ internal class Day02Test {
         "input, 0",
     )
     fun `part2 examples`(input: String, expectedResult: Int) {
-        assertEquals(expectedResult, ${dayString.capitalized()}.part2(input))
+        assertEquals(expectedResult, Day$paddedDay.part2(listOf(input)))
     }
 
     @Test
     fun `part2 puzzel input`() {
-        val input = Resource.readFile("$dayString")
-        assertEquals(0, ${dayString.capitalized()}.part2(input))
+        val input = Resource.readFileLines("day$paddedDay")
+        assertEquals(0, Day$paddedDay.part2(input))
     }
 }
     """.trimIndent()
