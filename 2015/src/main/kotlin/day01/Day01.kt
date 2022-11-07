@@ -1,7 +1,6 @@
 package day01
 
 class Day01 {
-
     companion object {
 
         private const val FLOOR_UP_CHAR = '('

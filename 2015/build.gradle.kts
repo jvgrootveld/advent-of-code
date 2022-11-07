@@ -50,7 +50,6 @@ task("addDay") {
         package day$paddedDay
 
         class Day$paddedDay {
-
             companion object {
             
                 fun part1(input: List<String>): Int {
