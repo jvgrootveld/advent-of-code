@@ -15,6 +15,7 @@ repositories {
 
 dependencies {
     implementation(gradleApi())
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 }
