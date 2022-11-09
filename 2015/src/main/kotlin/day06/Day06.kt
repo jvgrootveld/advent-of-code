@@ -11,13 +11,7 @@ class Day06 {
             val grid = Grid(1000, 1000)
 
             input.forEach {
-                Command.fromInput(it).also { command ->
-                    when (command.action) {
-                        Action.LIGHTS_ON -> grid.turnLightsOnFor(command.fromPoint, command.toPoint)
-                        Action.LIGHTS_OFF -> grid.turnLightsOffFor(command.fromPoint, command.toPoint)
-                        Action.TOGGLE_LIGHTS -> grid.toggleLightsFor(command.fromPoint, command.toPoint)
-                    }
-                }
+                ModernCommand.fromInput(it).invokeOnGrid(grid)
             }
 
             return grid.lightBrightness()
@@ -27,19 +21,13 @@ class Day06 {
             val grid = Grid(1000, 1000)
 
             input.forEach {
-                Command.fromInput(it).also { command ->
-                    when (command.action) {
-                        Action.LIGHTS_ON -> grid.ancientTurnLightsOnFor(command.fromPoint, command.toPoint)
-                        Action.LIGHTS_OFF -> grid.ancientTurnLightsOffFor(command.fromPoint, command.toPoint)
-                        Action.TOGGLE_LIGHTS -> grid.ancientToggleLightsFor(command.fromPoint, command.toPoint)
-                    }
-                }
+                AncientNordicElvishCommand.fromInput(it).invokeOnGrid(grid)
             }
 
             return grid.lightBrightness()
         }
 
-        class Grid(private val rowSize: Int, private val columnSize: Int) {
+        class Grid(rowSize: Int, columnSize: Int) {
             companion object {
                 const val ON = 1;
                 const val OFF = 0;
@@ -47,31 +35,7 @@ class Day06 {
 
             private val grid = Array(rowSize) { IntArray(columnSize) }
 
-            fun turnLightsOnFor(fromPoint: Point, toPoint: Point) = lightAction(fromPoint, toPoint) {
-                ON
-            }
-
-            fun turnLightsOffFor(fromPoint: Point, toPoint: Point) = lightAction(fromPoint, toPoint) {
-                OFF
-            }
-
-            fun toggleLightsFor(fromPoint: Point, toPoint: Point) = lightAction(fromPoint, toPoint) {
-                if (it == ON) OFF else ON
-            }
-
-            fun ancientTurnLightsOnFor(fromPoint: Point, toPoint: Point) = lightAction(fromPoint, toPoint) {
-                it + 1
-            }
-
-            fun ancientTurnLightsOffFor(fromPoint: Point, toPoint: Point) = lightAction(fromPoint, toPoint) {
-                if (it > 0) it - 1 else 0
-            }
-
-            fun ancientToggleLightsFor(fromPoint: Point, toPoint: Point) = lightAction(fromPoint, toPoint) {
-                it + 2
-            }
-
-            private fun lightAction(fromPoint: Point, toPoint: Point, action: (Int) -> Int) {
+            fun lightAction(fromPoint: Point, toPoint: Point, action: (Int) -> Int) {
                 for (x in fromPoint.x..toPoint.x) {
                     for (y in fromPoint.y..toPoint.y) {
                         grid[x][y] = action(grid[x][y])
@@ -96,7 +60,20 @@ class Day06 {
         TOGGLE_LIGHTS
     }
 
-    data class Command(val action: Action, val fromPoint: Point, val toPoint: Point) {
+    abstract class Command(private val action: Action, val fromPoint: Point, val toPoint: Point) {
+
+        abstract fun turnLightsOn(grid: Grid)
+        abstract fun turnLightsOff(grid: Grid)
+        abstract fun toggleLights(grid: Grid)
+
+        fun invokeOnGrid(grid: Grid) {
+            when (action) {
+                Action.LIGHTS_ON -> turnLightsOn(grid)
+                Action.LIGHTS_OFF -> turnLightsOff(grid)
+                Action.TOGGLE_LIGHTS -> toggleLights(grid)
+            }
+        }
+
         companion object {
             private const val PREFIX_TURN_ON = "turn on "
             private const val PREFIX_TURN_OFF = "turn off "
@@ -108,7 +85,7 @@ class Day06 {
              * - "toggle 0,0 through 999,0"
              * - "turn off 499,499 through 500,500"
              */
-            fun fromInput(input: String): Command {
+            fun parseInput(input: String): Triple<Action, Point, Point> {
                 var action = Action.LIGHTS_OFF
                 var fromPoint = Point(0, 0)
                 var toPoint = Point(0, 0)
@@ -129,7 +106,7 @@ class Day06 {
                         }
                     }
 
-                return Command(action, fromPoint, toPoint)
+                return Triple(action, fromPoint, toPoint)
             }
 
             /**
@@ -147,6 +124,49 @@ class Day06 {
 
                 return Pair(fromPoint, toPoint)
             }
+        }
+    }
+
+    class ModernCommand(action: Action, fromPoint: Point, toPoint: Point) : Command(action, fromPoint, toPoint) {
+        companion object {
+            fun fromInput(input: String): ModernCommand {
+                val (action, fromPoint, toPoint) = parseInput(input)
+                return ModernCommand(action, fromPoint, toPoint)
+            }
+        }
+
+        override fun turnLightsOn(grid: Grid) = grid.lightAction(fromPoint, toPoint) {
+            Grid.ON
+        }
+
+        override fun turnLightsOff(grid: Grid) = grid.lightAction(fromPoint, toPoint) {
+            Grid.OFF
+        }
+
+        override fun toggleLights(grid: Grid) = grid.lightAction(fromPoint, toPoint) {
+            if (it == Grid.ON) Grid.OFF else Grid.ON
+        }
+    }
+
+    class AncientNordicElvishCommand(action: Action, fromPoint: Point, toPoint: Point) :
+        Command(action, fromPoint, toPoint) {
+        companion object {
+            fun fromInput(input: String): AncientNordicElvishCommand {
+                val (action, fromPoint, toPoint) = parseInput(input)
+                return AncientNordicElvishCommand(action, fromPoint, toPoint)
+            }
+        }
+
+        override fun turnLightsOn(grid: Grid) = grid.lightAction(fromPoint, toPoint) {
+            it + 1
+        }
+
+        override fun turnLightsOff(grid: Grid) = grid.lightAction(fromPoint, toPoint) {
+            if (it > 0) it - 1 else 0
+        }
+
+        override fun toggleLights(grid: Grid) = grid.lightAction(fromPoint, toPoint) {
+            it + 2
         }
     }
 }
