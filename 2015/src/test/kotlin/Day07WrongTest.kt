@@ -1,12 +1,12 @@
-import day07.Day07
-import day07.Day07.Companion.Wire
+import day07.Day07Wrong
+import day07.Day07Wrong.Companion.Wire
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 
-internal class Day07Test {
+internal class Day07WrongWrongTest {
 
     private val part1Example = """
         123 -> x
@@ -21,7 +21,7 @@ internal class Day07Test {
 
     @Test
     fun `part1 examples`() {
-        Day07.part1(part1Example.lines()).let {
+        Day07Wrong.part1(part1Example.lines()).let {
             assertEquals(8, it.size)
             assertInWireStates(it, "d", 72u)
             assertInWireStates(it, "e", 507u)
@@ -37,19 +37,26 @@ internal class Day07Test {
     @Test
     fun `part1 puzzel input`() {
         val input = Resource.readFileLines("day07")
-        val result = Day07.part1(input)
+        val result = Day07Wrong.part1(input)
         assertInWireStates(result, "a", 16076u)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "input, 0",
+    )
+    fun `part2 examples`(input: String, expectedResult: Int) {
+        assertEquals(expectedResult, Day07Wrong.part2(listOf(input)))
     }
 
     @Test
     fun `part2 puzzel input`() {
         val input = Resource.readFileLines("day07")
-        val result = Day07.part2(input)
-        assertInWireStates(result, "a", 2797u)
+        assertEquals(0, Day07Wrong.part2(input))
     }
 
     private fun assertInWireStates(wires: Map<String, Wire>, wireId: String, expectedResult: UShort) {
         val wire = wires[wireId] ?: fail("Wire '$wireId' not found in map")
-        assertEquals(expectedResult, wire.getSignal())
+        assertEquals(expectedResult, wire.signal)
     }
 }

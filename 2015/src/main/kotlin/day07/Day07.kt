@@ -6,21 +6,31 @@ import java.lang.UnsupportedOperationException
 class Day07 {
     companion object {
 
-        val log = DebugLogger(true)
+        val log = DebugLogger(false)
 
         fun part1(input: List<String>): Map<String, Wire> {
             val circuit = Circuit()
 
-            input.map {
+            input.forEach {
                 gateFactory(circuit, it)
-            }.filterIsInstance<AssignNumberGate>()
-                .forEach(Gate::invokeIfPreconditionsAreMet)
+            }
 
             return circuit.wires
         }
 
-        fun part2(input: List<String>): Map<String, UShort> {
-            TODO("IMPLEMENT")
+        fun part2(input: List<String>): Map<String, Wire> {
+            val part1Results = part1(input)
+            val circuit = Circuit()
+
+            input.forEach {
+                gateFactory(circuit, it)
+            }
+
+            circuit.wires["b"]?.apply {
+                setSignal(part1Results["a"]!!.getSignal())
+            }
+
+            return circuit.wires
         }
 
         class Circuit {
@@ -31,26 +41,26 @@ class Day07 {
             }
         }
 
-        class Wire(val id: String) {
-            var signal: UShort = UShort.MIN_VALUE
-                set(value) {
-                    field = value
-                    checkGates()
-                }
+        class Wire(val id: String, var inputGate: Gate? = null) {
 
-            // Gates where this wire is a source
-            val gates: MutableList<Gate> = mutableListOf()
+            private var signal: UShort? = null
 
-            fun hasSignal(): Boolean {
-                return signal > UShort.MIN_VALUE
+            fun setSignal(value: UShort) {
+                signal = value
             }
 
-            private fun checkGates() {
-                log.debugln("CheckGates for $id($signal)")
-                gates.forEach {
-                    log.debugln("|  Gate $it")
+            fun getSignal(): UShort {
+                log.debugln("getSignal for $id")
+
+                if (inputGate == null) {
+                    throw Exception("Could not calculate signal for wire '$id'. No inputGate")
                 }
-                gates.forEach(Gate::invokeIfPreconditionsAreMet)
+
+                if (signal == null) {
+                    signal = inputGate?.calculate()
+                }
+                log.debugln("getSignal result $id = $signal")
+                return signal ?: throw Exception("Could not calculate signal for wire '$id'. Signal result null")
             }
 
             override fun toString(): String {
@@ -61,18 +71,7 @@ class Day07 {
         abstract class Gate(
             protected val target: Wire
         ) {
-            private var isInvoked = false
-
-            fun invokeIfPreconditionsAreMet() {
-                if (!isInvoked && preconditionsMet()) {
-                    isInvoked = true
-                    invoke()
-                }
-            }
-
-            // Check if all preconditions are met e.g. all sources have a signal
-            abstract fun preconditionsMet(): Boolean
-            abstract fun invoke()
+            abstract fun calculate(): UShort
         }
 
         class AssignNumberGate(
@@ -80,11 +79,9 @@ class Day07 {
         ) :
             Gate(target) {
 
-            override fun preconditionsMet(): Boolean = true
-
-            override fun invoke() {
-                target.signal = signal
-                log.debugln("Invoke: $this = ${target.signal}")
+            override fun calculate(): UShort {
+                log.debugln("calculate: $this = $signal")
+                return signal
             }
 
             override fun toString(): String {
@@ -97,21 +94,12 @@ class Day07 {
         ) :
             Gate(target) {
 
-            init {
-                source.gates.add(this)
-            }
-
-            override fun preconditionsMet(): Boolean {
-                return source.hasSignal()
-            }
-
-            override fun invoke() {
-                target.signal = source.signal
-                log.debugln("Invoke: $this = ${target.signal}")
+            override fun calculate(): UShort {
+                return source.getSignal()
             }
 
             override fun toString(): String {
-                return "${source.id}(${source.signal}) -> ${target.id}"
+                return "${source.id} -> ${target.id}"
             }
         }
 
@@ -120,21 +108,12 @@ class Day07 {
         ) :
             Gate(target) {
 
-            init {
-                source.gates.add(this)
-            }
-
-            override fun preconditionsMet(): Boolean {
-                return source.hasSignal()
-            }
-
-            override fun invoke() {
-                target.signal = source.signal xor UShort.MAX_VALUE
-                log.debugln("Invoke: $this = ${target.signal}")
+            override fun calculate(): UShort {
+                return source.getSignal() xor UShort.MAX_VALUE
             }
 
             override fun toString(): String {
-                return "NOT ${source.id}(${source.signal}) -> ${target.id}"
+                return "NOT ${source.id} -> ${target.id}"
             }
         }
 
@@ -145,22 +124,12 @@ class Day07 {
         ) :
             Gate(target) {
 
-            init {
-                sourceLeft.gates.add(this)
-                sourceRight.gates.add(this)
-            }
-
-            override fun preconditionsMet(): Boolean {
-                return sourceLeft.hasSignal() && sourceRight.hasSignal()
-            }
-
-            override fun invoke() {
-                target.signal = sourceLeft.signal and sourceRight.signal
-                log.debugln("Invoke: $this = ${target.signal}")
+            override fun calculate(): UShort {
+                return sourceLeft.getSignal() and sourceRight.getSignal()
             }
 
             override fun toString(): String {
-                return "${sourceLeft.id}(${sourceLeft.signal}) AND ${sourceRight.id}(${sourceRight.signal}) -> ${target.id}"
+                return "${sourceLeft.id} AND ${sourceRight.id} -> ${target.id}"
             }
         }
 
@@ -171,21 +140,12 @@ class Day07 {
         ) :
             Gate(target) {
 
-            init {
-                source.gates.add(this)
-            }
-
-            override fun preconditionsMet(): Boolean {
-                return source.hasSignal()
-            }
-
-            override fun invoke() {
-                target.signal = amount and source.signal
-                log.debugln("Invoke: $this = ${target.signal}")
+            override fun calculate(): UShort {
+                return amount and source.getSignal()
             }
 
             override fun toString(): String {
-                return "$amount AND ${source.id}(${source.signal}) -> ${target.id}"
+                return "$amount AND ${source.id} -> ${target.id}"
             }
         }
 
@@ -196,22 +156,12 @@ class Day07 {
         ) :
             Gate(target) {
 
-            init {
-                sourceLeft.gates.add(this)
-                sourceRight.gates.add(this)
-            }
-
-            override fun preconditionsMet(): Boolean {
-                return sourceLeft.hasSignal() && sourceRight.hasSignal()
-            }
-
-            override fun invoke() {
-                target.signal = sourceLeft.signal or sourceRight.signal
-                log.debugln("Invoke: $this = ${target.signal}")
+            override fun calculate(): UShort {
+                return sourceLeft.getSignal() or sourceRight.getSignal()
             }
 
             override fun toString(): String {
-                return "${sourceLeft.id}(${sourceLeft.signal}) OR ${sourceRight.id}(${sourceRight.signal}) -> ${target.id}"
+                return "${sourceLeft.id} OR ${sourceRight.id} -> ${target.id}"
             }
         }
 
@@ -222,21 +172,12 @@ class Day07 {
         ) :
             Gate(target) {
 
-            init {
-                source.gates.add(this)
-            }
-
-            override fun preconditionsMet(): Boolean {
-                return source.hasSignal()
-            }
-
-            override fun invoke() {
-                target.signal = amount or source.signal
-                log.debugln("Invoke: $this = ${target.signal}")
+            override fun calculate(): UShort {
+                return amount or source.getSignal()
             }
 
             override fun toString(): String {
-                return "$amount OR ${source.id}(${source.signal}) -> ${target.id}"
+                return "$amount OR ${source.id} -> ${target.id}"
             }
         }
 
@@ -247,21 +188,12 @@ class Day07 {
         ) :
             Gate(target) {
 
-            init {
-                source.gates.add(this)
-            }
-
-            override fun preconditionsMet(): Boolean {
-                return source.hasSignal()
-            }
-
-            override fun invoke() {
-                target.signal = (source.signal.toUInt() shl amount).toUShort()
-                log.debugln("Invoke: $this = ${target.signal}")
+            override fun calculate(): UShort {
+                return (source.getSignal().toUInt() shl amount).toUShort()
             }
 
             override fun toString(): String {
-                return "${source.id}(${source.signal}) LSHIFT $amount -> ${target.id}"
+                return "${source.id} LSHIFT $amount -> ${target.id}"
             }
         }
 
@@ -272,21 +204,12 @@ class Day07 {
         ) :
             Gate(target) {
 
-            init {
-                source.gates.add(this)
-            }
-
-            override fun preconditionsMet(): Boolean {
-                return source.hasSignal()
-            }
-
-            override fun invoke() {
-                target.signal = (source.signal.toUInt() shr amount).toUShort()
-                log.debugln("Invoke: $this = ${target.signal}")
+            override fun calculate(): UShort {
+                return (source.getSignal().toUInt() shr amount).toUShort()
             }
 
             override fun toString(): String {
-                return "${source.id}(${source.signal}) RSHIFT $amount -> ${target.id}"
+                return "${source.id} RSHIFT $amount -> ${target.id}"
             }
         }
 
@@ -295,37 +218,36 @@ class Day07 {
         }
 
         private fun gateFactory(
-            circuit:
-            Circuit, input: String
-        ): Gate {
-            log.debugln("Parse: $input")
+            circuit: Circuit,
+            input: String
+        ) {
             val (gateString, targetWireId) = input.split(" -> ")
 
             val targetWire = circuit.getOrCreateWire(targetWireId)
 
-            return gateString.split(' ').let { parts ->
+            val parts = gateString.split(' ')
+            var gate: Gate? = null
 
-                // Assign like "123 -> x" or "aa -> b"
-                if (parts.size == 1) {
-                    return parts[0].let {
-                        if (isNumeric(it)) {
-                            AssignNumberGate(it.toUShort(), targetWire)
-                        } else {
-                            val sourceWire = circuit.getOrCreateWire(it)
-                            AssignWireGate(sourceWire, targetWire)
-                        }
+            // Assign like "123 -> x" or "aa -> b"
+            if (parts.size == 1) {
+                parts[0].also {
+                    gate = if (isNumeric(it)) {
+                        AssignNumberGate(it.toUShort(), targetWire)
+                    } else {
+                        val sourceWire = circuit.getOrCreateWire(it)
+                        AssignWireGate(sourceWire, targetWire)
                     }
-                } else if (parts.size == 2) { // 'NOT' like "NOT x -> h"
-                    val sourceWire = circuit.getOrCreateWire(parts[1])
-                    return NotGate(sourceWire, targetWire)
                 }
-
+            } else if (parts.size == 2) { // 'NOT' like "NOT x -> h"
+                val sourceWire = circuit.getOrCreateWire(parts[1])
+                gate = NotGate(sourceWire, targetWire)
+            } else {
                 // The rest with 3 parts like "x AND y -> d" or "x LSHIFT 2 -> f"
                 val sourceLeft = parts[0]
                 val operation = parts[1]
                 val sourceRight = parts[2]
 
-                when (operation) {
+                gate = when (operation) {
                     "AND" -> andGateFactory(circuit, sourceLeft, sourceRight, targetWire)
                     "OR" -> orGateFactory(circuit, sourceLeft, sourceRight, targetWire)
                     "LSHIFT" -> ShiftLeftGate(circuit.getOrCreateWire(sourceLeft), sourceRight.toInt(), targetWire)
@@ -333,6 +255,8 @@ class Day07 {
                     else -> throw UnsupportedOperationException("Unknown action '$operation'")
                 }
             }
+
+            targetWire.inputGate = gate
         }
 
         private fun andGateFactory(
