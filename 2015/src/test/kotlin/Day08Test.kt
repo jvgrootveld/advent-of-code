@@ -31,15 +31,18 @@ internal class Day08Test {
 
     @ParameterizedTest
     @CsvSource(
-        "input, 0",
+        "\"\", 4",             // "" encodes to "\"\""                  =  6 -  2 = 4
+        "\"abc\", 4",         // "abc" encodes to "\"abc\""             =  9 -  5 = 4
+        "\"aaa\\\"aaa\", 6",  // "aaa\"aaa" encodes to "\"aaa\\\"aaa\"" = 16 - 10 = 6
+        "\"\\x27\", 5",       // "\x27" encodes to "\"\\x27\""          = 11 -  6 = 5
     )
     fun `part2 examples`(input: String, expectedResult: Int) {
-        assertEquals(expectedResult, Day08.part2(listOf(input)))
+        assertEquals(expectedResult, Day08.part2(input.toByteArray()))
     }
 
     @Test
     fun `part2 puzzel input`() {
-        val input = Resource.readFileLines("day08")
-        assertEquals(0, Day08.part2(input))
+        val input = Resource.readFileAsBytes("day08")
+        assertEquals(2046, Day08.part2(input))
     }
 }

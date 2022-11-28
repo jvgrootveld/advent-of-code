@@ -17,8 +17,40 @@ class Day08 {
             return Day08Result(stateMachine.lineResults)
         }
 
-        fun part2(input: List<String>): Int {
-            TODO("IMPLEMENT")
+        fun part2(input: ByteArray): Int {
+            var totalResult = 0
+            var charCountOriginal = 0
+            var charCountEncoded = 0
+
+            fun resetCount() {
+                charCountOriginal = 0
+                charCountEncoded = 2 // 2 for added surrounding quotes
+            }
+
+            resetCount()
+
+            for (charBytes in input) {
+
+                if (charBytes == CharBytes.NEW_LINE.byte) {
+                    // Add and reset
+                    totalResult += charCountEncoded - charCountOriginal
+                    resetCount()
+                    continue
+                }
+
+                charCountOriginal++
+
+                when(charBytes) {
+                    CharBytes.SLASH.byte -> charCountEncoded += 2
+                    CharBytes.QUOTE.byte -> charCountEncoded += 2
+                    else -> charCountEncoded++
+                }
+            }
+
+            // Add the last line
+            totalResult += charCountEncoded - charCountOriginal
+
+            return totalResult
         }
 
         class Day08Result(val lineResults: List<LineResult>) {
