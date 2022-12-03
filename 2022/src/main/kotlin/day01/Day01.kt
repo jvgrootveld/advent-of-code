@@ -40,8 +40,7 @@ class Day01 {
             calorieGroups.add(currentCalories)
 
             return calorieGroups
-                .sorted()
-                .reversed()
+                .sortedDescending()
                 .take(3)
                 .sum()
         }
