@@ -47,7 +47,7 @@ class Day05 {
         private fun parseStacks(input: String): HashMap<Int, Stack<Char>> {
             val stacks = HashMap<Int, Stack<Char>>()
 
-            val lines = input.split("\n").reversed().toMutableList().drop(1)
+            val lines = input.split("\n").reversed().drop(1)
 
             lines.forEach {
                 var stackI = 0
