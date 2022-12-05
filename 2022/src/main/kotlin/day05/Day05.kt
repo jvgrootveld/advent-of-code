@@ -1,6 +1,6 @@
 package day05
 
-import java.util.Stack
+import java.util.*
 
 class Day05 {
 
@@ -8,23 +8,12 @@ class Day05 {
 
         private val MATCH_NUMBERS = Regex("[0-9]+")
 
-        fun part1(input: String): String {
-            val inputParts = input.split("\n\n")
-            val stacks = parseStacks(inputParts[0])
-            val instructions = parseInstructions(inputParts[1])
-
-            instructions.forEach { instruction ->
-                repeat(instruction.move) {
-                    stacks[instruction.fromStack]?.pop()?.also {
-                        stacks[instruction.toStack]?.push(it)
-                    }
-                }
-            }
-
-            return getLastValues(stacks.values)
+        enum class CraneType {
+            CRATE_MOVER_9000,
+            CRATE_MOVER_9001
         }
 
-        fun part2(input: String): String {
+        fun day05(input: String, craneType: CraneType): String {
             val inputParts = input.split("\n\n")
             val stacks = parseStacks(inputParts[0])
             val instructions = parseInstructions(inputParts[1])
@@ -38,7 +27,13 @@ class Day05 {
                     }
                 }
 
-                stacks[instruction.toStack]?.addAll(pick.reversed())
+                stacks[instruction.toStack]?.addAll(
+                    if (craneType == CraneType.CRATE_MOVER_9000) {
+                        pick
+                    } else {
+                        pick.reversed()
+                    }
+                )
             }
 
             return getLastValues(stacks.values)

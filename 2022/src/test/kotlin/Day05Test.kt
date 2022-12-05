@@ -10,24 +10,24 @@ internal class Day05Test {
     @Test
     fun `part1 example`() {
         val input = Resource.readFile("day05_test")
-        assertEquals("CMZ", Day05.part1(input))
+        assertEquals("CMZ", Day05.day05(input, Day05.Companion.CraneType.CRATE_MOVER_9000))
     }
 
     @Test
     fun `part1 puzzel input`() {
         val input = Resource.readFile("day05")
-        assertEquals("FCVRLMVQP", Day05.part1(input))
+        assertEquals("FCVRLMVQP", Day05.day05(input, Day05.Companion.CraneType.CRATE_MOVER_9000))
     }
 
     @Test
     fun `part2 example`() {
         val input = Resource.readFile("day05_test")
-        assertEquals("MCD", Day05.part2(input))
+        assertEquals("MCD", Day05.day05(input, Day05.Companion.CraneType.CRATE_MOVER_9001))
     }
 
     @Test
     fun `part2 puzzel input`() {
         val input = Resource.readFile("day05")
-        assertEquals("RWLWGJGFD", Day05.part2(input))
+        assertEquals("RWLWGJGFD", Day05.day05(input, Day05.Companion.CraneType.CRATE_MOVER_9001))
     }
 }
