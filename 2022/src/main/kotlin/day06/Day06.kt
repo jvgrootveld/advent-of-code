@@ -14,6 +14,14 @@ class Day06 {
             return findStartOfPacketMarker(input, 14)
         }
 
+        private fun findStartOfPacketMarkerIdiomatic(message: String, markerSize: Int): Int {
+            return markerSize + message
+                .windowed(markerSize)
+                .indexOfFirst {
+                    it.toSet().size == markerSize
+                }
+        }
+
         private fun findStartOfPacketMarker(message: String, markerSize: Int): Int {
             val messageQueue = ArrayDeque<Char>(markerSize)
 
@@ -32,7 +40,7 @@ class Day06 {
                 position++
             }
 
-            return 0;
+            return -1
         }
     }
 }
