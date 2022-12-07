@@ -82,6 +82,10 @@ import org.junit.jupiter.params.provider.CsvSource
 
 internal class Day${paddedDay}Test {
 
+    private val input = Resource.readFileLines("day$paddedDay")
+    private val testInput = Resource.readFileLines("day${paddedDay}_test")
+    
+    
     @ParameterizedTest
     @CsvSource(
         "input, 0",
@@ -89,10 +93,14 @@ internal class Day${paddedDay}Test {
     fun `part1 examples`(input: String, expectedResult: Int) {
         assertEquals(expectedResult, Day$paddedDay.part1(listOf(input)))
     }
+    
+    @Test
+    fun `part1 examples`() {
+        assertEquals(0, Day$paddedDay.part1(testInput))
+    }
 
     @Test
     fun `part1 puzzel input`() {
-        val input = Resource.readFileLines("day$paddedDay")
         assertEquals(0, Day$paddedDay.part1(input))
     }
 
@@ -103,10 +111,14 @@ internal class Day${paddedDay}Test {
     fun `part2 examples`(input: String, expectedResult: Int) {
         assertEquals(expectedResult, Day$paddedDay.part2(listOf(input)))
     }
+    
+    @Test
+    fun `part2 examples`() {
+        assertEquals(0, Day$paddedDay.part2(testInput))
+    }
 
     @Test
     fun `part2 puzzel input`() {
-        val input = Resource.readFileLines("day$paddedDay")
         assertEquals(0, Day$paddedDay.part2(input))
     }
 }
