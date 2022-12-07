@@ -2,7 +2,7 @@ package day07
 
 import java.lang.RuntimeException
 
-typealias FolderSizePredicate = (folder: Day07.Companion.Folder) -> Boolean
+typealias FindFolderPredicate = (folder: Day07.Companion.Folder) -> Boolean
 
 class Day07 {
 
@@ -12,7 +12,7 @@ class Day07 {
             val fileSystem = FileSystem.of(input.drop(1)) // Drop first '$ cd /'
 
             return fileSystem.root
-                .findFoldersWithSize { it.size <= 100_000 }
+                .findFolders { it.size <= 100_000 }
                 .sumOf(Folder::size)
         }
 
@@ -24,7 +24,7 @@ class Day07 {
             val freeAtLeast = requiredSpace - (totalDiskSpace - fileSystem.root.size)
 
             return fileSystem.root
-                .findFoldersWithSize { it.size >= freeAtLeast }
+                .findFolders { it.size >= freeAtLeast }
                 .minByOrNull(Folder::size)
                 ?.size ?: -1L
         }
@@ -63,7 +63,7 @@ class Day07 {
                 return result.reversed().joinToString("")
             }
 
-            fun findFoldersWithSize(predicate: FolderSizePredicate): List<Folder> {
+            fun findFolders(predicate: FindFolderPredicate): List<Folder> {
                 val result = mutableListOf<Folder>()
 
                 if (predicate(this)) {
@@ -71,7 +71,7 @@ class Day07 {
                 }
 
                 for (folder in folders.values) {
-                    result.addAll(folder.findFoldersWithSize(predicate))
+                    result.addAll(folder.findFolders(predicate))
                 }
 
                 return result
