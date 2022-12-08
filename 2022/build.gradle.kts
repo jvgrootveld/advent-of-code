@@ -71,6 +71,11 @@ task("addDay") {
         )
 
         createFile(
+            "src/test/resources/day${paddedDay}_test.txt",
+            "Replace with day$paddedDay puzzle test input"
+        )
+
+        createFile(
             "src/test/kotlin/Day${paddedDay}Test.kt",
             """
 import day$paddedDay.Day$paddedDay
