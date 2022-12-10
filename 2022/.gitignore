@@ -2,3 +2,8 @@
 .idea
 *.iml
 build
+# Exclude real input from repo
+# See https://mobile.twitter.com/ericwastl/status/1465805354214830081
+# And https://www.reddit.com/r/adventofcode/wiki/faqs/copyright/puzzle_texts
+src/test/resources/*.txt
+!src/test/resources/*test*.txt
