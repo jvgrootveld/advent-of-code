@@ -3,6 +3,7 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 
+
 internal class Day08Test {
 
     private val input = Resource.readFileLines("day08")

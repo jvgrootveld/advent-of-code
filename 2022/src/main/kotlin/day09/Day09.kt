@@ -33,14 +33,14 @@ class Day09 {
                         val (first, second) = it
 
                         when {
-                            first isAboveRight second -> second.updateLocation(Direction.UP_RIGHT)
-                            first isAboveLeft second -> second.updateLocation(Direction.UP_LEFT)
-                            first isBelowRight second -> second.updateLocation(Direction.DOWN_RIGHT)
-                            first isBelowLeft second -> second.updateLocation(Direction.DOWN_LEFT)
-                            first isAbove second -> second.updateLocation(Direction.UP)
-                            first isBelow second -> second.updateLocation(Direction.DOWN)
-                            first isLeftOf second -> second.updateLocation(Direction.LEFT)
-                            first isRightOf second -> second.updateLocation(Direction.RIGHT)
+                            first distanceAboveRightOf second > 1 -> second.updateLocation(Direction.UP_RIGHT)
+                            first distanceAboveLeftOf second > 1 -> second.updateLocation(Direction.UP_LEFT)
+                            first distanceBelowRightOf second > 1 -> second.updateLocation(Direction.DOWN_RIGHT)
+                            first distanceBelowLeftOf second > 1 -> second.updateLocation(Direction.DOWN_LEFT)
+                            first distanceAboveOf second > 1 -> second.updateLocation(Direction.UP)
+                            first distanceBelowOf second > 1 -> second.updateLocation(Direction.DOWN)
+                            first distanceLeftOf second > 1 -> second.updateLocation(Direction.LEFT)
+                            first distanceRightOf second > 1 -> second.updateLocation(Direction.RIGHT)
                         }
                     }
 
@@ -53,27 +53,45 @@ class Day09 {
             return visitedLocations.size
         }
 
-//        private fun printGrid(visitedLocations: Set<Point>, knots: MutableList<Point>) {
-//            val size = 4
-//            val lines = mutableListOf<String>()
-//            for (y in 0..size) {
-//                var line = ""
-//                for (x in 0..size + 1) {
-//                    line += if (x == head.x && y == head.y) {
-//                        "H"
-//                    } else if (x == tail.x && y == tail.y) {
-//                        "T"
-//                    } else if (visitedLocations.contains(Point(x, y))) {
-//                        "#"
-//                    } else {
-//                        "."
-//                    }
-//                }
-//                lines.add(line)
-//            }
-//
-//            lines.asReversed().forEach(::println)
-//        }
+        private fun printGrid(visitedLocations: Set<Point>, knots: MutableList<Point>) {
+            val minY = minOf(visitedLocations.minOf(Point::y), knots.minOf(Point::y))
+            val maxY = maxOf(visitedLocations.maxOf(Point::y), knots.maxOf(Point::y))
+            val minX = minOf(visitedLocations.minOf(Point::x), knots.minOf(Point::x))
+            val maxX = maxOf(visitedLocations.maxOf(Point::x), knots.maxOf(Point::x))
+            val lines = mutableListOf<String>()
+
+            for (y in minY..maxY) {
+                var line = ""
+                for (x in minX..maxX + 1) {
+
+                    var knotDrawn = false
+                    knots.reversed()
+                        .forEachIndexed { i, knot ->
+                            if (knot == Point(x, y)) {
+                                knotDrawn = true
+                                line += if (i == knots.lastIndex) {
+                                    "H"
+                                } else {
+                                    i + 1
+                                }
+                            }
+                        }
+
+                    if (knotDrawn) {
+                        continue
+                    }
+
+                    line += if (visitedLocations.contains(Point(x, y))) {
+                        "#"
+                    } else {
+                        "."
+                    }
+                }
+                lines.add(line)
+            }
+
+            lines.asReversed().forEach(::println)
+        }
 
         data class Point(var x: Int = 0, var y: Int = 0) {
             fun updateLocation(direction: Direction) {
@@ -81,37 +99,46 @@ class Day09 {
                 y += direction.y
             }
 
-            infix fun isAbove(other: Point) = this.y > other.y && (this.y - other.y) > 1
-            infix fun isBelow(other: Point) = this.y < other.y && (other.y - this.y) > 1
-            infix fun isLeftOf(other: Point) = this.x < other.x && (other.x - this.x) > 1
-            infix fun isRightOf(other: Point) = this.x > other.x && (this.x - other.x) > 1
+            infix fun distanceAboveOf(other: Point) = if (this.y > other.y) (this.y - other.y) else 0
+            infix fun distanceBelowOf(other: Point) = if (this.y < other.y) (other.y - this.y) else 0
+            infix fun distanceLeftOf(other: Point) = if (this.x < other.x) (other.x - this.x) else 0
+            infix fun distanceRightOf(other: Point) = if (this.x > other.x) (this.x - other.x) else 0
 
-            infix fun isAboveRight(other: Point): Boolean {
-                if (this.y > other.y && this.x > other.x) {
-                    return (this.y - other.y) > 1 || (this.x - other.x) > 1
+            private fun calcMaxDiagonalDistance(distanceA: Int, distanceB: Int): Int {
+                if (distanceA > 0 && distanceB > 0) {
+                    return maxOf(distanceA, distanceB)
                 }
-                return false
+
+                return 0
             }
 
-            infix fun isAboveLeft(other: Point): Boolean {
-                if (this.y > other.y && this.x < other.x) {
-                    return (this.y - other.y) > 1 || (other.x - this.x) > 1
-                }
-                return false
+
+            infix fun distanceAboveRightOf(other: Point): Int {
+                return calcMaxDiagonalDistance(
+                    this distanceAboveOf other,
+                    this distanceRightOf other
+                )
             }
 
-            infix fun isBelowRight(other: Point): Boolean {
-                if (this.y < other.y && this.x > other.x) {
-                    return (other.y - this.y) > 1 || (this.x - other.x) > 1
-                }
-                return false
+            infix fun distanceAboveLeftOf(other: Point): Int {
+                return calcMaxDiagonalDistance(
+                    this distanceAboveOf other,
+                    this distanceLeftOf other
+                )
             }
 
-            infix fun isBelowLeft(other: Point): Boolean {
-                if (this.y < other.y && this.x < other.x) {
-                    return (other.y - this.y) > 1 || (other.x - this.x) > 1
-                }
-                return false
+            infix fun distanceBelowRightOf(other: Point): Int {
+                return calcMaxDiagonalDistance(
+                    this distanceBelowOf other,
+                    this distanceRightOf other
+                )
+            }
+
+            infix fun distanceBelowLeftOf(other: Point): Int {
+                return calcMaxDiagonalDistance(
+                    this distanceBelowOf other,
+                    this distanceLeftOf other
+                )
             }
         }
 
