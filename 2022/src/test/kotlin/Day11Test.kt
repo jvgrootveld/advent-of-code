@@ -19,10 +19,10 @@ internal class Day11Test {
     }
     @Test
     fun `part2 example`() {
-        assertEquals(2713310158L, Day11.part2(testInput))
+        assertEquals(2713310158, Day11.part2(testInput))
     }
     @Test
     fun `part2 puzzel input`() {
-        assertEquals(0, Day11.part2(input))
+        assertEquals(16792940265, Day11.part2(input))
     }
 }

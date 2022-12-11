@@ -11,36 +11,26 @@ class Day11 {
 
         fun part1(input: String): Long {
             val monkeys = parseInput(input).associateBy(Monkey::id)
-
-            for (round in 1..20) {
-                monkeys.forEach { (_, monkey) ->
-                    monkey.items.forEach { item ->
-                        item.worryLevel = monkey.inspectItem(item) / 3
-                        val newMonkeyId = monkey.chooseTargetMonkey(item.worryLevel)
-
-                        monkeys[newMonkeyId]?.items?.add(item)
-                    }
-                    monkey.items.clear()
-                }
-            }
-
-            val (m1, m2) = monkeys.values
-                .sortedByDescending(Monkey::totalItemsInspected)
-                .take(2)
-
-            return m1.totalItemsInspected * m2.totalItemsInspected
+            return startGame(monkeys, 20, 3)
         }
 
         fun part2(input: String): Long {
             val monkeys = parseInput(input).associateBy(Monkey::id)
+            return startGame(monkeys, 10_000, 1)
+        }
 
-            for (round in 1..10_000) {
+        private fun startGame(monkeys: Map<Int, Monkey>, rounds: Int, reliefModifier: Int): Long {
+           val commonDenominator = monkeys.values
+               .map(Monkey::divisibleValue)
+               .reduce { acc, v -> acc * v  }
+
+            for (round in 1..rounds) {
                 monkeys.forEach { (_, monkey) ->
                     monkey.items.forEach { item ->
-                        item.worryLevel = monkey.inspectItem(item)
-                        val newMonkeyId = monkey.chooseTargetMonkey(item.worryLevel)
+                        val newWorryLevel = (monkey.inspectItem(item) / reliefModifier) % commonDenominator
+                        val newMonkeyId = monkey.chooseTargetMonkey(newWorryLevel)
 
-                        monkeys[newMonkeyId]?.items?.add(item)
+                        monkeys[newMonkeyId]?.items?.add(newWorryLevel)
                     }
                     monkey.items.clear()
                 }
@@ -50,27 +40,22 @@ class Day11 {
                 .sortedByDescending(Monkey::totalItemsInspected)
                 .take(2)
 
-            // After 10000 rounds, the two most active monkeys inspected
-            // items 52166 and 52013 times.
-            // Multiplying these together, the level of monkey business in this situation
-            // is now 2713310158.
             return m1.totalItemsInspected * m2.totalItemsInspected
         }
-
-        data class Item(val id: Int, var worryLevel: Long)
 
         data class Monkey(
             val id: Int,
             val inspectOperation: MonkeyOperation,
             val chooseTargetMonkey: MonkeyTest,
-            val items: LinkedList<Item>
+            val items: MutableList<Long>,
+            val divisibleValue: Int
         ) {
             var totalItemsInspected = 0L
                 private set
 
-            fun inspectItem(item: Item): Long {
+            fun inspectItem(itemWorryLevel: Long): Long {
                 totalItemsInspected++
-                return inspectOperation(item.worryLevel)
+                return inspectOperation(itemWorryLevel)
             }
         }
 
@@ -82,27 +67,27 @@ class Day11 {
          *     If true: throw to monkey 2
          *     If false: throw to monkey 3
          */
-        fun parseInput(input: String): LinkedList<Monkey> {
+        private fun parseInput(input: String): LinkedList<Monkey> {
             val monkeys = LinkedList<Monkey>()
-            val itemIndexGenerator = generateSequence(0) { it + 1 }.iterator()
 
             input.split("\n\n").mapIndexed { i, value ->
                 val lines = value.split("\n").map(String::trimIndent)
 
-                val items = parseItems(lines[1], itemIndexGenerator)
+                val items = parseItems(lines[1])
                 val operation = parseOperation(lines[2])
                 val test = parseTest(lines[3], lines[4], lines[5])
+                val divisibleValue = lines[3].split(" ").last().toInt()
 
-                Monkey(i, operation, test, LinkedList<Item>(items))
+                Monkey(i, operation, test, items.toMutableList(), divisibleValue)
             }.forEach(monkeys::add)
 
             return monkeys
         }
 
         // Parse: Starting items: 79, 98
-        private fun parseItems(input: String, itemIndexGenerator: Iterator<Int>): List<Item> {
+        private fun parseItems(input: String): List<Long> {
             return MATCH_NUMBERS.findAll(input).map {
-                Item(itemIndexGenerator.next(), it.value.toLong())
+                it.value.toLong()
             }.toList()
         }
 
