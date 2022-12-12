@@ -1,12 +1,11 @@
 package day05
 
+import shared.extractInts
 import java.util.*
 
 class Day05 {
 
     companion object {
-
-        private val MATCH_NUMBERS = Regex("[0-9]+")
 
         enum class CraneType {
             CRATE_MOVER_9000,
@@ -71,10 +70,7 @@ class Day05 {
 
         private fun parseInstructions(input: String): List<Instruction> {
             return input.split("\n").map {
-                val (move, from, to) = MATCH_NUMBERS.findAll(it)
-                    .map(MatchResult::value)
-                    .map(String::toInt)
-                    .toList()
+                val (move, from, to) = it.extractInts()
 
                 Instruction(move, from - 1, to - 1)
             }

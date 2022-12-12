@@ -1,5 +1,6 @@
 package day11
 
+import shared.extractLongs
 import java.lang.RuntimeException
 import java.util.LinkedList
 
@@ -7,27 +8,26 @@ class Day11 {
 
     companion object {
 
-        private val MATCH_NUMBERS = Regex("[0-9]+")
-
         fun part1(input: String): Long {
             val monkeys = parseInput(input).associateBy(Monkey::id)
-            return startGame(monkeys, 20, 3)
+            return startGame(monkeys, 20) { it / 3 }
         }
 
         fun part2(input: String): Long {
             val monkeys = parseInput(input).associateBy(Monkey::id)
-            return startGame(monkeys, 10_000, 1)
+
+            val commonDenominator = monkeys.values
+                .map(Monkey::divisibleValue)
+                .reduce { acc, v -> acc * v }
+
+            return startGame(monkeys, 10_000) { it % commonDenominator }
         }
 
-        private fun startGame(monkeys: Map<Int, Monkey>, rounds: Int, reliefModifier: Int): Long {
-           val commonDenominator = monkeys.values
-               .map(Monkey::divisibleValue)
-               .reduce { acc, v -> acc * v  }
-
+        private fun startGame(monkeys: Map<Int, Monkey>, rounds: Int, reliefOperation: ReliefOperation): Long {
             for (round in 1..rounds) {
                 monkeys.forEach { (_, monkey) ->
                     monkey.items.forEach { item ->
-                        val newWorryLevel = (monkey.inspectItem(item) / reliefModifier) % commonDenominator
+                        val newWorryLevel = reliefOperation(monkey.inspectItem(item))
                         val newMonkeyId = monkey.chooseTargetMonkey(newWorryLevel)
 
                         monkeys[newMonkeyId]?.items?.add(newWorryLevel)
@@ -73,7 +73,8 @@ class Day11 {
             input.split("\n\n").mapIndexed { i, value ->
                 val lines = value.split("\n").map(String::trimIndent)
 
-                val items = parseItems(lines[1])
+                // Parse: Starting items: 79, 98
+                val items = lines[1].extractLongs()
                 val operation = parseOperation(lines[2])
                 val test = parseTest(lines[3], lines[4], lines[5])
                 val divisibleValue = lines[3].split(" ").last().toInt()
@@ -82,13 +83,6 @@ class Day11 {
             }.forEach(monkeys::add)
 
             return monkeys
-        }
-
-        // Parse: Starting items: 79, 98
-        private fun parseItems(input: String): List<Long> {
-            return MATCH_NUMBERS.findAll(input).map {
-                it.value.toLong()
-            }.toList()
         }
 
         // Parse: Operation: new = old * 19
@@ -139,3 +133,4 @@ class Day11 {
 
 typealias MonkeyOperation = (value: Long) -> Long
 typealias MonkeyTest = (value: Long) -> Int
+typealias ReliefOperation = (value: Long) -> Long
